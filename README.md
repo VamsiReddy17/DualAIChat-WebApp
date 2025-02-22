@@ -1,4 +1,7 @@
 **Dual AI Chatbots - Azure Web App**
+
+
+
 Dual AI Chatbots - Azure Web App is a web application that integrates two chatbot models—GPT-4 and DeepSeek—into a single interface. A common user prompt is sent concurrently to both chatbots, and their responses are displayed side by side. This project demonstrates how to use Azure Static Web Apps for the frontend and Azure Functions for the backend to create a multi-AI integration solution.
 
 Features
