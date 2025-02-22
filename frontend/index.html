@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Dual Chatbots</title>
+   <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   <div class="chatbots-container">
+      <!-- GPT-4 Chat Bot Container -->
+      <div class="chatbot" id="chatbot-gpt">
+         <div class="chat-header">
+            <img src="assets/chatgpt.png" alt="GPT-4">
+            <h2>GPT-4 Chat Bot</h2>
+         </div>
+         <div class="chat-box" id="chatBoxChatGPT"></div>
+      </div>
+      
+      <!-- DeepSeek Chat Bot Container -->
+      <div class="chatbot" id="chatbot-deepseek">
+         <div class="chat-header">
+            <img src="assets/deepseek.png" alt="DeepSeek">
+            <h2>DeepSeek Chat Bot</h2>
+         </div>
+         <div class="chat-box" id="chatBoxDeepSeek"></div>
+      </div>
+   </div>
+   
+   <!-- Common Input Section -->
+   <div class="input-container">
+      <input type="text" id="userInput" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+   </div>
+   
+   <script src="scripts.js"></script>
+</body>
+</html>
