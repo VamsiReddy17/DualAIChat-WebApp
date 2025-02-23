@@ -27,5 +27,4 @@ Supports formatting of code blocks within responses (wrapped in triple backticks
  
 ![image](https://github.com/user-attachments/assets/d109da56-6291-4ab6-8956-0ed6f246de6f)
 
-
-![image](https://github.com/user-attachments/assets/cdc312fc-43cd-4fd0-8fc9-2c482c195942)
+ 
