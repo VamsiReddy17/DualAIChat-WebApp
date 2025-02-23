@@ -54,31 +54,50 @@ body {
     min-height: 400px;
 }
 
+					 
 .input-container {
     width: 100%;
     max-width: 1200px;
     display: flex;
-    gap: 10px;
+    align-items: center;        /* Vertically center items */
+    height: 10vh;               /* Adjust height as needed */
+    gap: 15px;                  /* Slightly larger gap for breathing room */
+    padding: 10px;              /* Add padding for a polished look */
+    background: #ffffff;        /* White background */
+    border-radius: 12px;        /* Modern rounding */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    box-sizing: border-box;
 }
 
-.input-container input {
-    flex: 1;                    /* Keeps flexibility */
-    padding: 15px;              /* Slightly larger padding for better touch/visibility */
-    font-size: 18px;            /* Larger font for readability on full page */
-    border: none;               /* No change, keeps clean look */
-    border-radius: 8px;         /* Slightly larger radius to match modern full-page aesthetic */
-    box-sizing: border-box;     /* Ensures padding doesn’t increase width */
-    width: 100%;                /* Ensures it takes full available width */
+.input-container textarea {
+    flex: 1;                    /* Takes up available space */
+    padding: 15px;              /* Consistent padding */
+    font-size: 18px;            /* Readable font size */
+    border: none;               /* No border for seamless look */
+    border-radius: 8px;         /* Slightly rounded edges */
+    background: #f5f6f5;        /* Light gray background */
+    outline: none;              /* Remove default outline */
+    box-sizing: border-box;     /* Ensure padding fits within width */
+    width: 100%;                /* Full width within flex */
+    min-height: 50px;           /* Minimum height for visibility */
+    resize: vertical;           /* Allow vertical resizing only */
+    line-height: 1.5;           /* Better line spacing for readability */
+    overflow-y: auto;           /* Scroll if content exceeds height */
 }
 
 .input-container button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    background: #667eea;
-    color: white;
-    border-radius: 5555px;
-    cursor: pointer;
+    padding: 12px 24px;         /* Larger padding for prominence */
+    font-size: 16px;            /* Readable size */
+    border: none;               /* No border */
+    background: #667eea;        /* Your color */
+    color: white;               /* White text */
+    border-radius: 50px;        /* Pill-shaped button */
+    cursor: pointer;            /* Hand cursor */
+    transition: background 0.2s ease; /* Smooth hover effect */
+}
+
+.input-container button:hover {
+    background: #5a67d8;        /* Darker shade on hover */
 }
 
 /* Message Styles */
