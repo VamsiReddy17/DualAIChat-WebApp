@@ -4,7 +4,7 @@ import json
 import os
 import requests
 
-AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT")
+DEEPSEEK_ENDPOINT = os.getenv("DEEPSEEK_ENDPOINT")
 AZURE_KEY = os.getenv("AZURE_KEY")
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -34,7 +34,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 headers={"Access-Control-Allow-Origin": "*"}
             )
 
-        url = f"{AZURE_ENDPOINT}/models/chat/completions?api-version=2024-05-01-preview"
+        url = f"{DEEPSEEK_ENDPOINT}/models/chat/completions?api-version=2024-05-01-preview"
         headers = {
             "Content-Type": "application/json",
             "api-key": AZURE_KEY
