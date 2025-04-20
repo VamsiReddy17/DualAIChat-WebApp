@@ -5,6 +5,7 @@ import os
 import requests
 
 AZURE_OPENAI_KEY = os.getenv("AZURE_KEY")
+AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT")
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Processing ChatGPT request.")
@@ -33,8 +34,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             )
 
         # ✅ Using your Azure OpenAI endpoint
-        url = "https://txd61-m9nyyhgs-eastus2.cognitiveservices.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2025-01-01-preview"
-        
+        url = AZURE_ENDPOINT
         headers = {
             "Content-Type": "application/json",
             "api-key": AZURE_OPENAI_KEY
@@ -46,7 +46,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 {"role": "system", "content": "You are a helpful assistant. Keep responses short and direct."},
                 {"role": "user", "content": user_message}
             ],
-            "max_tokens": 900,
+            "max_tokens": 2000,
             "temperature": 0.5
         }
 
