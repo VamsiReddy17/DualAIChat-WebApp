@@ -152,11 +152,9 @@ document.addEventListener("DOMContentLoaded", function () {
         showTypingIndicator('DeepSeek');
 
         // Define API endpoints based on environment
-        const apiBaseUrl = window.location.hostname.includes('replit') 
-            ? `https://${window.location.hostname.replace('.replit.dev', '--3000.replit.dev')}` 
-            : 'http://localhost:7071';
-
-        console.log(`🔗 Using API base URL: ${apiBaseUrl}`);
+        // API Configuration - Use local backend server
+        const apiBaseUrl = 'http://localhost:7071';
+        console.log('🔗 Using API base URL:', apiBaseUrl);
 
         try {
             // Send requests to both APIs
