@@ -190,9 +190,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     `;
                 }
             } else {
+                // Demo response when backend is not available
                 chatBoxChatGPT.innerHTML += `
-                    <div class="message bot-message" style="color: var(--error-color);">
-                        ❌ Failed to connect to GPT-4 server.
+                    <div class="message bot-message" style="color: var(--warning-color);">
+                        🔧 Demo Mode: GPT-4 backend not connected.<br>
+                        <em>Your message: "${message}"</em><br><br>
+                        This is a demo response. To get real AI responses, you need to:<br>
+                        1. Set up Azure OpenAI service<br>
+                        2. Configure the backend Azure Functions<br>
+                        3. Add your API keys to environment variables
                     </div>
                 `;
             }
@@ -220,9 +226,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     `;
                 }
             } else {
+                // Demo response when backend is not available
                 chatBoxDeepSeek.innerHTML += `
-                    <div class="message bot-message" style="color: var(--error-color);">
-                        ❌ Failed to connect to DeepSeek server.
+                    <div class="message bot-message" style="color: var(--warning-color);">
+                        🔧 Demo Mode: DeepSeek backend not connected.<br>
+                        <em>Your message: "${message}"</em><br><br>
+                        This is a demo response. To get real AI responses, you need to:<br>
+                        1. Set up DeepSeek API access<br>
+                        2. Configure the backend Azure Functions<br>
+                        3. Add your API keys to environment variables
                     </div>
                 `;
             }
