@@ -151,8 +151,8 @@ document.addEventListener("DOMContentLoaded", function () {
         showTypingIndicator('GPT');
         showTypingIndicator('DeepSeek');
 
-        // API Configuration - Use local backend server on port 7071
-        const apiBaseUrl = 'http://0.0.0.0:7071';
+        // API Configuration - Use local backend server
+        const apiBaseUrl = 'http://localhost:7071';
         console.log('🔗 Using API base URL:', apiBaseUrl);
 
         try {
