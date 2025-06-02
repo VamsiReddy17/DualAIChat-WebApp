@@ -4,7 +4,7 @@ modules = ["nodejs-20", "python-3.12", "web"]
 channel = "stable-24_05"
 
 [workflows]
-runButton = "Start Web Server"
+runButton = "Start Full App"
 
 [[workflows.workflow]]
 name = "Start Web Server"
@@ -14,6 +14,19 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python server.py"
+
+[[workflows.workflow]]
+name = "Start Full App"
+author = 41777580
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python server.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python backend_server.py"
 
 [[ports]]
 localPort = 5000
