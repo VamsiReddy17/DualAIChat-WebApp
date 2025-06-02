@@ -30,15 +30,19 @@ args = "pkill -f \"backend_server.py\" || true"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
+args = "sleep 3"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python backend_server.py &"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
 args = "sleep 2"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python server.py &"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python backend_server.py"
+args = "python server.py"
 
 [[ports]]
 localPort = 5000
