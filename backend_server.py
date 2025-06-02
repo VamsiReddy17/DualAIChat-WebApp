@@ -37,7 +37,12 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == '/health':
-            self.send_json_response({"status": "healthy", "message": "Backend server is running"})
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response_data = {"status": "healthy", "message": "Backend server is running"}
+            self.wfile.write(json.dumps(response_data).encode('utf-8'))
         else:
             self.send_error(404, "Endpoint not found")
 
@@ -158,9 +163,16 @@ def run_backend_server():
 
 if __name__ == "__main__":
     print("🔧 Starting backend server...")
+    print(f"🐍 Python version: {os.sys.version}")
+    print(f"📁 Working directory: {os.getcwd()}")
+    
     try:
         run_backend_server()
+    except KeyboardInterrupt:
+        print("\n👋 Backend server stopped by user")
     except Exception as e:
         print(f"❌ Backend server failed to start: {str(e)}")
         import traceback
         traceback.print_exc()
+        import sys
+        sys.exit(1)
