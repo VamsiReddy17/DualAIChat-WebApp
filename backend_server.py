@@ -13,6 +13,20 @@ AZURE_OPENAI_KEY = os.getenv("AZURE_KEY")
 AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT")
 DEEPSEEK_ENDPOINT = os.getenv("DEEPSEEK_ENDPOINT")
 
+# Check if environment variables are set
+print("🔍 Checking environment variables...")
+if not AZURE_OPENAI_KEY:
+    print("⚠️  AZURE_KEY not found in environment")
+if not AZURE_ENDPOINT:
+    print("⚠️  AZURE_ENDPOINT not found in environment") 
+if not DEEPSEEK_ENDPOINT:
+    print("⚠️  DEEPSEEK_ENDPOINT not found in environment")
+
+if AZURE_OPENAI_KEY and AZURE_ENDPOINT and DEEPSEEK_ENDPOINT:
+    print("✅ All environment variables are set!")
+else:
+    print("⚠️  Some environment variables are missing. API calls will fail until they're set.")
+
 class APIHandler(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
