@@ -84,7 +84,9 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
                 "temperature": 0.5
             }
 
-            response = requests.post(AZURE_ENDPOINT, json=data, headers=headers)
+            # Use the full Azure OpenAI endpoint URL
+            azure_url = "https://txd61-m9nyyhgs-eastus2.cognitiveservices.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2025-01-01-preview"
+            response = requests.post(azure_url, json=data, headers=headers)
             response.raise_for_status()
             ai_response = response.json()
 
@@ -155,11 +157,33 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
 
 def run_backend_server():
     PORT = 7071
-    with socketserver.TCPServer(("0.0.0.0", PORT), APIHandler) as httpd:
-        print(f"🔥 Backend API server running at http://0.0.0.0:{PORT}")
-        print("🤖 ChatGPT API: http://0.0.0.0:7071/api/ChatGpt_api")
-        print("🧠 DeepSeek API: http://0.0.0.0:7071/api/DeepSeek_api")
-        httpd.serve_forever()
+    try:
+        # Allow port reuse
+        socketserver.TCPServer.allow_reuse_address = True
+        with socketserver.TCPServer(("0.0.0.0", PORT), APIHandler) as httpd:
+            print(f"🔥 Backend API server running at http://0.0.0.0:{PORT}")
+            print("🤖 ChatGPT API: http://0.0.0.0:7071/api/ChatGpt_api")
+            print("🧠 DeepSeek API: http://0.0.0.0:7071/api/DeepSeek_api")
+            print("✅ Server ready to accept connections!")
+            httpd.serve_forever()
+    except OSError as e:
+        if "Address already in use" in str(e):
+            print(f"❌ Port {PORT} is already in use. Trying to kill existing process...")
+            import subprocess
+            try:
+                subprocess.run(["pkill", "-f", "backend_server.py"], check=False)
+                print("🔄 Retrying server startup...")
+                import time
+                time.sleep(2)
+                with socketserver.TCPServer(("0.0.0.0", PORT), APIHandler) as httpd:
+                    print(f"🔥 Backend API server running at http://0.0.0.0:{PORT}")
+                    httpd.serve_forever()
+            except Exception as retry_e:
+                print(f"❌ Failed to restart server: {retry_e}")
+                raise
+        else:
+            print(f"❌ Server startup error: {e}")
+            raise
 
 if __name__ == "__main__":
     print("🔧 Starting backend server...")
