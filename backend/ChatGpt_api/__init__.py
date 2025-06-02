@@ -34,7 +34,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             )
 
         # ✅ Using your Azure OpenAI endpoint
-        url = AZURE_ENDPOINT
+        url = "https://txd61-m9nyyhgs-eastus2.cognitiveservices.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2025-01-01-preview"
         headers = {
             "Content-Type": "application/json",
             "api-key": AZURE_OPENAI_KEY
