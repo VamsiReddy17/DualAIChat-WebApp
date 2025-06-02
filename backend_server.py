@@ -35,6 +35,12 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
+    def do_GET(self):
+        if self.path == '/health':
+            self.send_json_response({"status": "healthy", "message": "Backend server is running"})
+        else:
+            self.send_error(404, "Endpoint not found")
+
     def do_POST(self):
         try:
             if self.path == '/api/ChatGpt_api':
@@ -151,4 +157,10 @@ def run_backend_server():
         httpd.serve_forever()
 
 if __name__ == "__main__":
-    run_backend_server()
+    print("🔧 Starting backend server...")
+    try:
+        run_backend_server()
+    except Exception as e:
+        print(f"❌ Backend server failed to start: {str(e)}")
+        import traceback
+        traceback.print_exc()
