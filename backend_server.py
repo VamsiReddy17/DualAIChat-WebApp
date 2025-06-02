@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 import http.server
 import socketserver
@@ -61,9 +60,9 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
         req_body = json.loads(post_data.decode('utf-8'))
-        
+
         user_message = req_body.get("message", "")
-        
+
         if not user_message:
             self.send_json_response({"error": "Message is required"}, 400)
             return
@@ -73,7 +72,7 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
                 "Content-Type": "application/json",
                 "api-key": AZURE_OPENAI_KEY
             }
-            
+
             data = {
                 "model": "gpt-4o-mini",
                 "messages": [
@@ -98,15 +97,21 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
             self.send_json_response({"reply": reply_text})
 
         except Exception as e:
+            print(f"❌ ChatGPT API error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             self.send_json_response({"error": "Azure AI request failed", "details": str(e)}, 500)
+        except Exception as parse_error:
+            print(f"❌ ChatGPT request parsing error: {str(parse_error)}")
+            self.send_json_response({"error": "Request parsing failed", "details": str(parse_error)}, 400)
 
     def handle_deepseek(self):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
         req_body = json.loads(post_data.decode('utf-8'))
-        
+
         user_message = req_body.get("message", "")
-        
+
         if not user_message:
             self.send_json_response({"error": "Message is required"}, 400)
             return
@@ -117,7 +122,7 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
                 "Content-Type": "application/json",
                 "api-key": AZURE_OPENAI_KEY
             }
-            
+
             data = {
                 "model": "DeepSeek-R1",
                 "messages": [
@@ -134,7 +139,7 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
 
             if "choices" in ai_response and len(ai_response["choices"]) > 0:
                 full_response = ai_response["choices"][0]["message"]["content"]
-                
+
                 # Remove <think>...</think> from the response
                 if "<think>" in full_response and "</think>" in full_response:
                     reply_text = full_response.split("</think>")[-1].strip()
@@ -146,7 +151,13 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
             self.send_json_response({"reply": reply_text})
 
         except Exception as e:
+            print(f"❌ DeepSeek API error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             self.send_json_response({"error": "Azure AI request failed", "details": str(e)}, 500)
+        except Exception as parse_error:
+            print(f"❌ DeepSeek request parsing error: {str(parse_error)}")
+            self.send_json_response({"error": "Request parsing failed", "details": str(parse_error)}, 400)
 
     def send_json_response(self, data, status_code=200):
         self.send_response(status_code)
@@ -189,7 +200,7 @@ if __name__ == "__main__":
     print("🔧 Starting backend server...")
     print(f"🐍 Python version: {os.sys.version}")
     print(f"📁 Working directory: {os.getcwd()}")
-    
+
     try:
         run_backend_server()
     except KeyboardInterrupt:

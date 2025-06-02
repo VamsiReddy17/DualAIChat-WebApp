@@ -1,13 +1,12 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     // Global variables
     const userInputElem = document.getElementById("userInput");
     const sendButton = document.getElementById("sendButton");
     const charCount = document.getElementById("charCount");
-    
+
     // Initialize character counter
     updateCharacterCount();
-    
+
     // Auto-resize textarea
     userInputElem.addEventListener('input', function() {
         this.style.height = 'auto';
@@ -15,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
         updateCharacterCount();
         updateSendButton();
     });
-    
+
     // Enter key handling
     userInputElem.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -23,20 +22,20 @@ document.addEventListener("DOMContentLoaded", function () {
             sendMessage();
         }
     });
-    
+
     // Update character count
     function updateCharacterCount() {
         const count = userInputElem.value.length;
         charCount.textContent = count;
         charCount.style.color = count > 1800 ? 'var(--error-color)' : 'var(--text-muted)';
     }
-    
+
     // Update send button state
     function updateSendButton() {
         const hasText = userInputElem.value.trim().length > 0;
         sendButton.disabled = !hasText;
     }
-    
+
     // Clear chat function
     window.clearChat = function(chatBoxId) {
         const chatBox = document.getElementById(chatBoxId);
@@ -45,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const message = chatBoxId.includes('ChatGPT') ? 
             "I'm ready to help you with any questions or tasks!" :
             "Let's explore ideas and solve problems together!";
-            
+
         chatBox.innerHTML = `
             <div class="welcome-message">
                 <div class="welcome-icon">${icon}</div>
@@ -54,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
     };
-    
+
     // Show typing indicator
     function showTypingIndicator(botType) {
         const indicator = document.getElementById(`typing${botType}`);
@@ -62,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
             indicator.style.display = 'flex';
         }
     }
-    
+
     // Hide typing indicator
     function hideTypingIndicator(botType) {
         const indicator = document.getElementById(`typing${botType}`);
@@ -70,23 +69,23 @@ document.addEventListener("DOMContentLoaded", function () {
             indicator.style.display = 'none';
         }
     }
-    
+
     // Format message with code blocks and better styling
     function formatMessage(message) {
         // Handle code blocks
         message = message.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
             return `<pre class="code-block"><code>${codeContent.trim()}</code></pre>`;
         });
-        
+
         // Handle inline code
         message = message.replace(/`([^`]+)`/g, '<code style="background: #e2e8f0; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.875em;">$1</code>');
-        
+
         // Handle line breaks
         message = message.replace(/\n/g, '<br>');
-        
+
         return message;
     }
-    
+
     // Retry mechanism with exponential backoff
     async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
         for (let i = 0; i < retries; i++) {
@@ -105,34 +104,34 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         throw new Error("❌ Too many requests, try again later.");
     }
-    
+
     // Add timestamp to messages
     function getCurrentTime() {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
-    
+
     // Send message function
     async function sendMessage() {
         const message = userInputElem.value.trim();
         if (!message || sendButton.disabled) return;
-        
+
         // Clear input and update UI
         userInputElem.value = "";
         userInputElem.style.height = 'auto';
         updateCharacterCount();
         updateSendButton();
         sendButton.disabled = true;
-        
+
         // Get chat boxes
         const chatBoxChatGPT = document.getElementById("chatBoxChatGPT");
         const chatBoxDeepSeek = document.getElementById("chatBoxDeepSeek");
-        
+
         // Clear welcome messages if they exist
         const welcomeGPT = chatBoxChatGPT.querySelector('.welcome-message');
         const welcomeDeepSeek = chatBoxDeepSeek.querySelector('.welcome-message');
         if (welcomeGPT) welcomeGPT.remove();
         if (welcomeDeepSeek) welcomeDeepSeek.remove();
-        
+
         // Add user message with timestamp
         const timestamp = getCurrentTime();
         const userMsgHTML = `
@@ -143,30 +142,37 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         chatBoxChatGPT.innerHTML += userMsgHTML;
         chatBoxDeepSeek.innerHTML += userMsgHTML;
-        
+
         // Scroll to bottom
         chatBoxChatGPT.scrollTop = chatBoxChatGPT.scrollHeight;
         chatBoxDeepSeek.scrollTop = chatBoxDeepSeek.scrollHeight;
-        
+
         // Show typing indicators
         showTypingIndicator('GPT');
         showTypingIndicator('DeepSeek');
-        
+
+        // Define API endpoints based on environment
+        const apiBaseUrl = window.location.hostname.includes('replit') 
+            ? `https://${window.location.hostname.replace('.replit.dev', '--3000.replit.dev')}` 
+            : 'http://localhost:7071';
+
+        console.log(`🔗 Using API base URL: ${apiBaseUrl}`);
+
         try {
             // Send requests to both APIs
             const [responseGPT, responseDeepSeek] = await Promise.allSettled([
-                fetchWithRetry("http://localhost:7071/api/ChatGpt_api", {
+                fetchWithRetry(`${apiBaseUrl}/api/ChatGpt_api`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: message })
                 }),
-                fetchWithRetry("http://localhost:7071/api/DeepSeek_api", {
+                fetchWithRetry(`${apiBaseUrl}/api/DeepSeek_api`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: message })
                 })
             ]);
-            
+
             // Handle GPT-4 response
             hideTypingIndicator('GPT');
             if (responseGPT.status === 'fulfilled') {
@@ -175,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const replyGPT = dataGPT.reply || "GPT-4 did not respond.";
                     const formattedReplyGPT = formatMessage(replyGPT);
                     const responseTime = getCurrentTime();
-                    
+
                     chatBoxChatGPT.innerHTML += `
                         <div class="message bot-message">
                             ${formattedReplyGPT}
@@ -183,6 +189,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     `;
                 } catch (error) {
+                    console.error("Error parsing GPT-4 response:", error);
                     chatBoxChatGPT.innerHTML += `
                         <div class="message bot-message" style="color: var(--error-color);">
                             ❌ Error parsing GPT-4 response.
@@ -190,6 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     `;
                 }
             } else {
+                console.error("GPT-4 request failed:", responseGPT.reason);
                 // Demo response when backend is not available
                 chatBoxChatGPT.innerHTML += `
                     <div class="message bot-message" style="color: var(--warning-color);">
@@ -202,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 `;
             }
-            
+
             // Handle DeepSeek response
             hideTypingIndicator('DeepSeek');
             if (responseDeepSeek.status === 'fulfilled') {
@@ -211,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const replyDeepSeek = dataDeepSeek.reply || "DeepSeek did not respond.";
                     const formattedReplyDeepSeek = formatMessage(replyDeepSeek);
                     const responseTime = getCurrentTime();
-                    
+
                     chatBoxDeepSeek.innerHTML += `
                         <div class="message bot-message">
                             ${formattedReplyDeepSeek}
@@ -219,6 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     `;
                 } catch (error) {
+                    console.error("Error parsing DeepSeek response:", error);
                     chatBoxDeepSeek.innerHTML += `
                         <div class="message bot-message" style="color: var(--error-color);">
                             ❌ Error parsing DeepSeek response.
@@ -226,6 +235,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     `;
                 }
             } else {
+                console.error("DeepSeek request failed:", responseDeepSeek.reason);
                 // Demo response when backend is not available
                 chatBoxDeepSeek.innerHTML += `
                     <div class="message bot-message" style="color: var(--warning-color);">
@@ -238,12 +248,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 `;
             }
-            
+
         } catch (error) {
             console.error("Error:", error);
             hideTypingIndicator('GPT');
             hideTypingIndicator('DeepSeek');
-            
+
             const errorMsg = `
                 <div class="message bot-message" style="color: var(--error-color);">
                     ❌ Network error. Please check your connection and try again.
@@ -254,19 +264,19 @@ document.addEventListener("DOMContentLoaded", function () {
         } finally {
             // Re-enable send button
             sendButton.disabled = false;
-            
+
             // Scroll to bottom
             chatBoxChatGPT.scrollTop = chatBoxChatGPT.scrollHeight;
             chatBoxDeepSeek.scrollTop = chatBoxDeepSeek.scrollHeight;
-            
+
             // Focus back to input
             userInputElem.focus();
         }
     }
-    
+
     // Expose functions to global scope
     window.sendMessage = sendMessage;
-    
+
     // Focus input on load
     userInputElem.focus();
 });
