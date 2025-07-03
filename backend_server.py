@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 import http.server
 import socketserver
@@ -24,13 +25,14 @@ if not DEEPSEEK_ENDPOINT:
 if AZURE_OPENAI_KEY and AZURE_ENDPOINT and DEEPSEEK_ENDPOINT:
     print("✅ All environment variables are set!")
 else:
-    print("⚠️  Some environment variables are missing. API calls will fail until they're set.")
+    print("⚠️  Some environment variables are missing. API calls will fail")
 
 class APIHandler(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
-        self.send_response(200)
+        """Handle CORS preflight requests"""
+        self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
@@ -58,37 +60,37 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
             response_data = {"status": "healthy", "message": "Backend server is running"}
             self.wfile.write(json.dumps(response_data).encode('utf-8'))
         else:
-            self.send_error(404, "Endpoint not found")
+            self.send_response(404)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Endpoint not found"}).encode('utf-8'))
 
     def do_POST(self):
-        try:
-            if self.path == '/api/ChatGpt_api':
-                self.handle_chatgpt()
-            elif self.path == '/api/DeepSeek_api':
-                self.handle_deepseek()
-            else:
-                self.send_json_response({"error": "API endpoint not found"}, 404)
-        except Exception as e:
-            print(f"❌ POST request error: {str(e)}")
-            self.send_json_response({"error": "Server error", "details": str(e)}, 500)
+        if self.path == '/api/ChatGpt_api':
+            self.handle_chatgpt()
+        elif self.path == '/api/DeepSeek_api':
+            self.handle_deepseek()
+        else:
+            self.send_json_response({"error": "Endpoint not found"}, 404)
 
     def handle_chatgpt(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        req_body = json.loads(post_data.decode('utf-8'))
-
-        user_message = req_body.get("message", "")
-
-        if not user_message:
-            self.send_json_response({"error": "Message is required"}, 400)
-            return
-
         try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            req_body = json.loads(post_data.decode('utf-8'))
+
+            user_message = req_body.get("message", "")
+
+            if not user_message:
+                self.send_json_response({"error": "Message is required"}, 400)
+                return
+
             headers = {
                 "Content-Type": "application/json",
                 "api-key": AZURE_OPENAI_KEY
             }
-
+            
             data = {
                 "model": "gpt-4o-mini",
                 "messages": [
@@ -119,23 +121,22 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
             self.send_json_response({"error": "Azure AI request failed", "details": str(e)}, 500)
 
     def handle_deepseek(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        req_body = json.loads(post_data.decode('utf-8'))
-
-        user_message = req_body.get("message", "")
-
-        if not user_message:
-            self.send_json_response({"error": "Message is required"}, 400)
-            return
-
         try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            req_body = json.loads(post_data.decode('utf-8'))
+
+            user_message = req_body.get("message", "")
+
+            if not user_message:
+                self.send_json_response({"error": "Message is required"}, 400)
+                return
+
             url = f"{DEEPSEEK_ENDPOINT}/models/chat/completions?api-version=2024-05-01-preview"
             headers = {
                 "Content-Type": "application/json",
                 "api-key": AZURE_OPENAI_KEY
             }
-
             data = {
                 "model": "DeepSeek-R1",
                 "messages": [
@@ -150,6 +151,7 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
             response.raise_for_status()
             ai_response = response.json()
 
+            # Extract the correct response text
             if "choices" in ai_response and len(ai_response["choices"]) > 0:
                 full_response = ai_response["choices"][0]["message"]["content"]
 
@@ -219,5 +221,3 @@ if __name__ == "__main__":
         print(f"❌ Backend server failed to start: {str(e)}")
         import traceback
         traceback.print_exc()
-        import sys
-        sys.exit(1)
