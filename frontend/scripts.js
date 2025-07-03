@@ -160,20 +160,20 @@ document.addEventListener("DOMContentLoaded", function () {
             const hostname = window.location.hostname;
             
             // Your hostname pattern: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb.sisko.replit.dev
-            // Backend should be accessible at: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2--3000.sisko.replit.dev
+            // Backend should be accessible at: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2--7071.sisko.replit.dev
             if (hostname.includes('.sisko.replit.dev')) {
-                // Extract the UUID part and replace the -00-* suffix with --3000
+                // Extract the UUID part and replace the -00-* suffix with --7071
                 const fullId = hostname.split('.')[0]; // b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb
                 const uuid = fullId.substring(0, 36); // First 36 chars are the UUID: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2
-                apiBaseUrl = `https://${uuid}--3000.sisko.replit.dev`;
+                apiBaseUrl = `https://${uuid}--7071.sisko.replit.dev`;
             } else if (hostname.includes('--80-')) {
                 // Standard pattern with --80- suffix
-                const backendHostname = hostname.replace('--80-', '--3000-');
+                const backendHostname = hostname.replace('--80-', '--7071-');
                 apiBaseUrl = `https://${backendHostname}`;
             } else {
                 // Fallback for other patterns
                 const replId = hostname.split('.')[0].split('-')[0];
-                apiBaseUrl = `https://${replId}--3000.replit.dev`;
+                apiBaseUrl = `https://${replId}--7071.replit.dev`;
             }
         } else {
             // Fallback for local development
