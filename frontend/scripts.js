@@ -156,17 +156,17 @@ document.addEventListener("DOMContentLoaded", function () {
         let apiBaseUrl;
         
         if (currentUrl.includes('replit.dev')) {
-            // For Replit, use the same domain but different port
+            // For Replit, construct the backend URL using the 3000 external port mapping
             const hostname = window.location.hostname;
-            // Check if we're on a webview URL or main URL
+            
             if (hostname.includes('--80-')) {
-                // Replace port 80 with port 7071 for backend
-                const backendHostname = hostname.replace('--80-', '--7071-');
+                // Replace --80- with --3000- (backend external port)
+                const backendHostname = hostname.replace('--80-', '--3000-');
                 apiBaseUrl = `https://${backendHostname}`;
             } else {
-                // Fallback: construct backend URL manually
+                // Extract the repl ID and construct backend URL
                 const replId = hostname.split('.')[0];
-                apiBaseUrl = `https://${replId}--7071.replit.dev`;
+                apiBaseUrl = `https://${replId}--3000.replit.dev`;
             }
         } else {
             // Fallback for local development
