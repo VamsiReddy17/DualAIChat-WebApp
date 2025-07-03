@@ -159,12 +159,21 @@ document.addEventListener("DOMContentLoaded", function () {
             // For Replit, construct the backend URL using the 3000 external port mapping
             const hostname = window.location.hostname;
             
-            if (hostname.includes('--80-')) {
-                // Replace --80- with --3000- (backend external port)
-                const backendHostname = hostname.replace('--80-', '--3000-');
-                apiBaseUrl = `https://${backendHostname}`;
+            // Your hostname pattern: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb.sisko.replit.dev
+            // We need to change the port suffix to access port 3000
+            if (hostname.includes('.sisko.replit.dev')) {
+                // Replace the UUID pattern with --3000 suffix
+                const baseId = hostname.split('.')[0]; // get everything before first dot
+                const parts = baseId.split('-00-'); // split on -00-
+                if (parts.length === 2) {
+                    const replId = parts[0]; // the UUID part
+                    apiBaseUrl = `https://${replId}--3000.replit.dev`;
+                } else {
+                    // Fallback - try to construct from full hostname
+                    apiBaseUrl = currentUrl.replace('https://', 'https://').replace('.replit.dev', '--3000.replit.dev').split('/')[0] + '//';
+                }
             } else {
-                // Extract the repl ID and construct backend URL
+                // Standard Replit pattern
                 const replId = hostname.split('.')[0];
                 apiBaseUrl = `https://${replId}--3000.replit.dev`;
             }
