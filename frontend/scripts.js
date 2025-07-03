@@ -159,8 +159,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (currentUrl.includes('replit.dev')) {
             // Extract the base Replit URL and construct the backend URL
             const hostname = window.location.hostname;
-            // Replace the port number in the hostname
-            const backendHostname = hostname.replace('--80', '--3000');
+            // Replace the frontend port (80) with backend port (3000)
+            const backendHostname = hostname.replace('.replit.dev', '--3000.replit.dev');
             apiBaseUrl = `https://${backendHostname}`;
         } else {
             // Fallback for local development
