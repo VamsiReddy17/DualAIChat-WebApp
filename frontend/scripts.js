@@ -167,10 +167,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 const parts = baseId.split('-00-'); // split on -00-
                 if (parts.length === 2) {
                     const replId = parts[0]; // the UUID part
-                    apiBaseUrl = `https://${replId}--3000.replit.dev`;
+                    apiBaseUrl = `https://${replId}--3000.sisko.replit.dev`;
                 } else {
                     // Fallback - try to construct from full hostname
-                    apiBaseUrl = currentUrl.replace('https://', 'https://').replace('.replit.dev', '--3000.replit.dev').split('/')[0] + '//';
+                    apiBaseUrl = hostname.replace('.sisko.replit.dev', '--3000.sisko.replit.dev');
+                    apiBaseUrl = `https://${apiBaseUrl}`;
                 }
             } else {
                 // Standard Replit pattern
