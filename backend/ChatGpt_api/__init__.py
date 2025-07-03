@@ -3,9 +3,23 @@ import azure.functions as func
 import json
 import os
 import requests
+from flask import Flask, request, jsonify
+
 
 AZURE_OPENAI_KEY = os.getenv("AZURE_KEY")
 AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT")
+
+app = Flask(__name__)
+
+
+@app.route('/api/ChatGpt_api', methods=['POST'])
+def chatgpt_api():
+    # Handle your POST request here
+    data = request.json  # Assuming you're sending JSON data
+    # Process data and return a response
+    return jsonify({"message": "ChatGPT API reached", "data": data}), 200
+
+
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Processing ChatGPT request.")

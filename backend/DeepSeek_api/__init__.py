@@ -4,8 +4,29 @@ import json
 import os
 import requests
 
+from flask import Flask, request, jsonify
+
+
+
 DEEPSEEK_ENDPOINT = os.getenv("DEEPSEEK_ENDPOINT")
 AZURE_KEY = os.getenv("AZURE_KEY")
+
+app = Flask(__name__)
+
+
+@app.route('/api/DeepSeek_api', methods=['POST'])
+def deep_seek_api():
+    # Handle your POST request here
+    data = request.json  # Assuming you're sending JSON data
+    # Process data and return a response
+    return jsonify({"message": "DeepSeek API reached", "data": data}), 200
+
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Processing a request.")
