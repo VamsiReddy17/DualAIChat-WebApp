@@ -35,7 +35,22 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.path == '/health':
+        if self.path == '/':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response_data = {
+                "message": "Backend API Server", 
+                "status": "running",
+                "endpoints": {
+                    "chatgpt": "/api/ChatGpt_api",
+                    "deepseek": "/api/DeepSeek_api",
+                    "health": "/health"
+                }
+            }
+            self.wfile.write(json.dumps(response_data).encode('utf-8'))
+        elif self.path == '/health':
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
