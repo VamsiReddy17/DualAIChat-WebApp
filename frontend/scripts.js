@@ -160,22 +160,19 @@ document.addEventListener("DOMContentLoaded", function () {
             const hostname = window.location.hostname;
             
             // Your hostname pattern: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb.sisko.replit.dev
-            // We need to change the port suffix to access port 3000
+            // Backend should be accessible at: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2--3000.sisko.replit.dev
             if (hostname.includes('.sisko.replit.dev')) {
-                // Replace the UUID pattern with --3000 suffix
-                const baseId = hostname.split('.')[0]; // get everything before first dot
-                const parts = baseId.split('-00-'); // split on -00-
-                if (parts.length === 2) {
-                    const replId = parts[0]; // the UUID part
-                    apiBaseUrl = `https://${replId}--3000.sisko.replit.dev`;
-                } else {
-                    // Fallback - try to construct from full hostname
-                    apiBaseUrl = hostname.replace('.sisko.replit.dev', '--3000.sisko.replit.dev');
-                    apiBaseUrl = `https://${apiBaseUrl}`;
-                }
+                // Extract the UUID part and replace the -00-* suffix with --3000
+                const fullId = hostname.split('.')[0]; // b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb
+                const uuid = fullId.substring(0, 36); // First 36 chars are the UUID: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2
+                apiBaseUrl = `https://${uuid}--3000.sisko.replit.dev`;
+            } else if (hostname.includes('--80-')) {
+                // Standard pattern with --80- suffix
+                const backendHostname = hostname.replace('--80-', '--3000-');
+                apiBaseUrl = `https://${backendHostname}`;
             } else {
-                // Standard Replit pattern
-                const replId = hostname.split('.')[0];
+                // Fallback for other patterns
+                const replId = hostname.split('.')[0].split('-')[0];
                 apiBaseUrl = `https://${replId}--3000.replit.dev`;
             }
         } else {
