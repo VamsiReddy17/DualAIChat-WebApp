@@ -52,9 +52,10 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
             elif self.path == '/api/DeepSeek_api':
                 self.handle_deepseek()
             else:
-                self.send_error(404, "API endpoint not found")
+                self.send_json_response({"error": "API endpoint not found"}, 404)
         except Exception as e:
-            self.send_error(500, f"Server error: {str(e)}")
+            print(f"❌ POST request error: {str(e)}")
+            self.send_json_response({"error": "Server error", "details": str(e)}, 500)
 
     def handle_chatgpt(self):
         content_length = int(self.headers['Content-Length'])
@@ -101,9 +102,6 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
             import traceback
             traceback.print_exc()
             self.send_json_response({"error": "Azure AI request failed", "details": str(e)}, 500)
-        except Exception as parse_error:
-            print(f"❌ ChatGPT request parsing error: {str(parse_error)}")
-            self.send_json_response({"error": "Request parsing failed", "details": str(parse_error)}, 400)
 
     def handle_deepseek(self):
         content_length = int(self.headers['Content-Length'])
@@ -155,9 +153,6 @@ class APIHandler(http.server.BaseHTTPRequestHandler):
             import traceback
             traceback.print_exc()
             self.send_json_response({"error": "Azure AI request failed", "details": str(e)}, 500)
-        except Exception as parse_error:
-            print(f"❌ DeepSeek request parsing error: {str(parse_error)}")
-            self.send_json_response({"error": "Request parsing failed", "details": str(parse_error)}, 400)
 
     def send_json_response(self, data, status_code=200):
         self.send_response(status_code)

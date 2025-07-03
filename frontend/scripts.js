@@ -151,8 +151,20 @@ document.addEventListener("DOMContentLoaded", function () {
         showTypingIndicator('GPT');
         showTypingIndicator('DeepSeek');
 
-        // API Configuration - Use backend server on external port 3000
-        const apiBaseUrl = window.location.origin.replace(':5000', ':3000').replace('--80', '--3000');
+        // API Configuration - Use backend server on port 7071
+        // In Replit, port 7071 maps to external port 3000
+        const currentUrl = window.location.href;
+        let apiBaseUrl;
+        
+        if (currentUrl.includes('replit.dev')) {
+            // Extract the base Replit URL and map to port 3000
+            const replitBase = currentUrl.split('--')[0];
+            apiBaseUrl = `${replitBase}--3000.replit.dev`;
+        } else {
+            // Fallback for local development
+            apiBaseUrl = 'http://localhost:7071';
+        }
+        
         console.log('🔗 Using API base URL:', apiBaseUrl);
 
         try {
