@@ -152,16 +152,22 @@ document.addEventListener("DOMContentLoaded", function () {
         showTypingIndicator('DeepSeek');
 
         // API Configuration - Use backend server on port 7071
-        // Since backend runs on port 7071 which maps to external port 3000
         const currentUrl = window.location.href;
         let apiBaseUrl;
         
         if (currentUrl.includes('replit.dev')) {
-            // Extract the base Replit URL and construct the backend URL
+            // For Replit, use the same domain but different port
             const hostname = window.location.hostname;
-            // Replace the frontend port (80) with backend port (3000)
-            const backendHostname = hostname.replace('.replit.dev', '--3000.replit.dev');
-            apiBaseUrl = `https://${backendHostname}`;
+            // Check if we're on a webview URL or main URL
+            if (hostname.includes('--80-')) {
+                // Replace port 80 with port 7071 for backend
+                const backendHostname = hostname.replace('--80-', '--7071-');
+                apiBaseUrl = `https://${backendHostname}`;
+            } else {
+                // Fallback: construct backend URL manually
+                const replId = hostname.split('.')[0];
+                apiBaseUrl = `https://${replId}--7071.replit.dev`;
+            }
         } else {
             // Fallback for local development
             apiBaseUrl = 'http://localhost:7071';
