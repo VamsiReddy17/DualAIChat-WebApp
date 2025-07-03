@@ -18,7 +18,7 @@ args = "python server.py"
 [[workflows.workflow]]
 name = "Start Full App"
 author = 41777580
-mode = "parallel"
+mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
