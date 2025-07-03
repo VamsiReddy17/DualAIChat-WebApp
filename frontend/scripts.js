@@ -156,16 +156,18 @@ document.addEventListener("DOMContentLoaded", function () {
         let apiBaseUrl;
         
         if (currentUrl.includes('replit.dev')) {
-            // For Replit, construct the backend URL using the 3000 external port mapping
+            // For Replit, construct the backend URL using port 7071
             const hostname = window.location.hostname;
+            console.log('🔍 Current hostname:', hostname);
             
             // Your hostname pattern: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb.sisko.replit.dev
             // Backend should be accessible at: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2--7071.sisko.replit.dev
             if (hostname.includes('.sisko.replit.dev')) {
-                // Extract the UUID part and replace the -00-* suffix with --7071
+                // Extract the UUID part (first 36 characters before any dashes)
                 const fullId = hostname.split('.')[0]; // b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb
                 const uuid = fullId.substring(0, 36); // First 36 chars are the UUID: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2
                 apiBaseUrl = `https://${uuid}--7071.sisko.replit.dev`;
+                console.log('🎯 Constructed backend URL:', apiBaseUrl);
             } else if (hostname.includes('--80-')) {
                 // Standard pattern with --80- suffix
                 const backendHostname = hostname.replace('--80-', '--7071-');
