@@ -4,7 +4,7 @@ modules = ["nodejs-20", "python-3.12", "web"]
 channel = "stable-24_05"
 
 [workflows]
-runButton = "Start Full App"
+runButton = "Start Backend Only"
 
 [[workflows.workflow]]
 name = "Start Web Server"
