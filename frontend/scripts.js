@@ -110,6 +110,32 @@ document.addEventListener("DOMContentLoaded", function () {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
+    // Detect if running in Replit environment
+    function getBackendUrl() {
+        const hostname = window.location.hostname;
+        console.log('🔍 Current hostname:', hostname);
+
+        if (hostname.includes('.replit.dev')) {
+            // Extract the repl ID and construct the backend URL
+            // Format: replid-00-hash.domain.replit.dev becomes replid--7071.domain.replit.dev
+            const parts = hostname.split('.');
+            const replPart = parts[0]; // e.g., "b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb"
+            const domain = parts.slice(1).join('.'); // e.g., "sisko.replit.dev"
+
+            // Extract the repl ID (everything before the last dash-number-hash pattern)
+            const replId = replPart.replace(/-\d+-\w+$/, '');
+            console.log('🔍 Repl ID extracted:', replId);
+
+            // Construct backend URL with port 7071
+            const backendUrl = `https://${replId}--7071.${domain}`;
+            console.log('🎯 Constructed backend URL:', backendUrl);
+            return backendUrl;
+        }
+
+        // Fallback for local development
+        return 'http://localhost:7071';
+    }
+
     // Send message function
     async function sendMessage() {
         const message = userInputElem.value.trim();
@@ -152,49 +178,8 @@ document.addEventListener("DOMContentLoaded", function () {
         showTypingIndicator('DeepSeek');
 
         // API Configuration - Use backend server on port 7071
-        const currentUrl = window.location.href;
-        let apiBaseUrl;
-        
-        if (currentUrl.includes('replit.dev')) {
-            // For Replit, construct the backend URL using port 7071
-            const hostname = window.location.hostname;
-            console.log('🔍 Current hostname:', hostname);
-            
-            // Your hostname pattern: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb.sisko.replit.dev
-            // Backend should be accessible at: b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2--7071.sisko.replit.dev
-            if (hostname.includes('.sisko.replit.dev')) {
-                // Extract the UUID part - it's everything before the first '-00-' or similar pattern
-                const fullId = hostname.split('.')[0]; // b4ab41e5-8b0c-4dd1-9907-ae912ffa81f2-00-2hjilheadcopb
-                console.log('🔍 Full ID extracted:', fullId);
-                
-                // Find the UUID part (before -00- pattern)
-                const uuidMatch = fullId.match(/^([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/);
-                if (uuidMatch) {
-                    const uuid = uuidMatch[1];
-                    console.log('🔍 UUID extracted:', uuid);
-                    apiBaseUrl = `https://${uuid}--7071.sisko.replit.dev`;
-                    console.log('🎯 Constructed backend URL:', apiBaseUrl);
-                } else {
-                    // Fallback - try first 36 characters
-                    const uuid = fullId.substring(0, 36);
-                    console.log('🔍 UUID fallback:', uuid);
-                    apiBaseUrl = `https://${uuid}--7071.sisko.replit.dev`;
-                    console.log('🎯 Constructed backend URL (fallback):', apiBaseUrl);
-                }
-            } else if (hostname.includes('--80-')) {
-                // Standard pattern with --80- suffix
-                const backendHostname = hostname.replace('--80-', '--7071-');
-                apiBaseUrl = `https://${backendHostname}`;
-            } else {
-                // Fallback for other patterns
-                const replId = hostname.split('.')[0].split('-')[0];
-                apiBaseUrl = `https://${replId}--7071.replit.dev`;
-            }
-        } else {
-            // Fallback for local development
-            apiBaseUrl = 'http://localhost:7071';
-        }
-        
+        const apiBaseUrl = getBackendUrl();
+
         console.log('🔗 Using API base URL:', apiBaseUrl);
 
         try {
