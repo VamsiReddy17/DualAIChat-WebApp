@@ -1,41 +1,60 @@
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
-from app.schemas.chat import ChatRequest, ChatResponse
-from app.services.llm_service import AzureOpenAIService, DeepSeekService
 import json
 import time
+import logging
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
+from app.schemas.chat import ChatRequest, ChatResponse, ModelName
+from app.services.llm_service import AzureOpenAIService, DeepSeekService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 azure_service = AzureOpenAIService()
 deepseek_service = DeepSeekService()
 
+
+def _get_service(model: ModelName):
+    if model == ModelName.GPT4:
+        return azure_service
+    return deepseek_service
+
+
 @router.post("/completions", response_model=ChatResponse)
 async def chat_completion(request: ChatRequest):
-    if request.model == "gpt-4":
-        return await azure_service.get_completion(request)
-    elif request.model == "deepseek":
-        return await deepseek_service.get_completion(request)
-    else:
-        raise HTTPException(status_code=400, detail="Invalid model specified")
+    service = _get_service(request.model)
+    return await service.get_completion(request)
+
 
 @router.post("/stream")
 async def chat_stream(request: ChatRequest):
-    if request.model == "gpt-4":
-        service = azure_service
-    elif request.model == "deepseek":
-        service = deepseek_service
-    else:
-        raise HTTPException(status_code=400, detail="Invalid model")
+    service = _get_service(request.model)
 
     async def event_generator():
         start_time = time.time()
-        async for chunk in service.get_streaming_completion(request):
-            yield chunk
-        
-        # Final metadata chunk (optional, can be used for latency/usage)
-        latency = time.time() - start_time
-        # We send a special JSON chunk at the end for metadata
-        yield f"\n\n--METADATA--\n{json.dumps({'latency': latency, 'model': request.model})}"
+        try:
+            async for chunk in service.get_streaming_completion(request):
+                # SSE format: data: {json}\n\n
+                payload = json.dumps({"type": "delta", "content": chunk})
+                yield f"data: {payload}\n\n"
 
-    return StreamingResponse(event_generator(), media_type="text/plain")
+            latency = time.time() - start_time
+            done_payload = json.dumps({
+                "type": "done",
+                "latency": round(latency, 3),
+                "model": request.model.value,
+            })
+            yield f"data: {done_payload}\n\n"
+        except Exception:
+            logger.exception("Stream error for model %s", request.model.value)
+            error_payload = json.dumps({"type": "error", "content": "An error occurred during streaming."})
+            yield f"data: {error_payload}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )

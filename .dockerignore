@@ -1,0 +1,9 @@
+.git
+.env
+*.md
+node_modules
+venv
+__pycache__
+.pytest_cache
+.mypy_cache
+archive

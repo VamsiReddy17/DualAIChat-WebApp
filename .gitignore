@@ -1,2 +1,49 @@
+# ============================================================
+# Dual AI Chat — .gitignore
+# ============================================================
+
+# ---- Secrets ----
 .env
-venv
+.env.local
+.env.*.local
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+venv/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.pyo
+
+# ---- Node / Frontend ----
+node_modules/
+frontend/dist/
+.cache/
+*.tsbuildinfo
+
+# ---- IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Docker ----
+docker-compose.override.yml
+
+# ---- Misc ----
+*.log
+*.tmp

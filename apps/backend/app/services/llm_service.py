@@ -1,11 +1,16 @@
-import httpx
 import time
-import json
+import logging
 import asyncio
-from typing import AsyncGenerator, Dict, Any, List
+from typing import AsyncGenerator, Dict, Any
 from fastapi import HTTPException
+from openai import AsyncAzureOpenAI, AsyncOpenAI, APIError, APITimeoutError
 from app.core.config import settings
 from app.schemas.chat import ChatRequest
+
+logger = logging.getLogger(__name__)
+
+REQUEST_TIMEOUT = 60  # seconds
+
 
 class BaseLLMService:
     async def get_completion(self, request: ChatRequest) -> Dict[str, Any]:
@@ -14,129 +19,135 @@ class BaseLLMService:
     async def get_streaming_completion(self, request: ChatRequest) -> AsyncGenerator[str, None]:
         raise NotImplementedError
 
+
 class AzureOpenAIService(BaseLLMService):
+    """Azure OpenAI (Cognitive Services) - gpt-4o-mini."""
+
     def __init__(self):
-        self.api_key = settings.AZURE_KEY
-        self.endpoint = settings.AZURE_ENDPOINT.rstrip("/")
-        self.deployment = "gpt-4o" 
-        self.api_version = "2024-02-15-preview"
-        self.url = f"{self.endpoint}/openai/deployments/{self.deployment}/chat/completions?api-version={self.api_version}"
+        self.client = AsyncAzureOpenAI(
+            api_version=settings.AZURE_API_VERSION,
+            azure_endpoint=settings.AZURE_ENDPOINT.rstrip("/") if settings.AZURE_ENDPOINT else "",
+            api_key=settings.AZURE_KEY,
+            timeout=REQUEST_TIMEOUT,
+        )
+        self.deployment = settings.AZURE_DEPLOYMENT
 
     async def get_completion(self, request: ChatRequest) -> Dict[str, Any]:
         start_time = time.time()
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            payload = {
-                "messages": [
-                    {"role": "system", "content": request.system_prompt},
-                    {"role": "user", "content": request.message}
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.deployment,
+                messages=[
+                    {"role": "system", "content": request.system_prompt or ""},
+                    {"role": "user", "content": request.message},
                 ],
-                "temperature": 0.7,
-                "max_tokens": 2000
+                max_tokens=4096,
+                temperature=0.7,
+                top_p=1.0,
+            )
+            latency = time.time() - start_time
+            return {
+                "reply": response.choices[0].message.content or "",
+                "model": self.deployment,
+                "usage": response.usage.model_dump() if response.usage else None,
+                "latency": round(latency, 3),
             }
-            headers = {"api-key": self.api_key, "Content-Type": "application/json"}
-            
-            try:
-                response = await client.post(self.url, headers=headers, json=payload)
-                response.raise_for_status()
-                data = response.json()
-                latency = time.time() - start_time
-                
-                return {
-                    "reply": data["choices"][0]["message"]["content"],
-                    "model": "gpt-4o",
-                    "usage": data.get("usage"),
-                    "latency": latency
-                }
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Azure OpenAI Error: {str(e)}")
+        except APITimeoutError:
+            logger.error("Azure OpenAI request timed out")
+            raise HTTPException(status_code=504, detail="Azure OpenAI request timed out. Please try again.")
+        except APIError as e:
+            logger.error("Azure OpenAI API error: status=%s", e.status_code)
+            raise HTTPException(status_code=502, detail="Azure OpenAI service error. Please try again.")
+        except Exception as e:
+            logger.exception("Unexpected Azure OpenAI error")
+            raise HTTPException(status_code=500, detail="An unexpected error occurred with Azure OpenAI.")
 
     async def get_streaming_completion(self, request: ChatRequest) -> AsyncGenerator[str, None]:
-        async with httpx.AsyncClient(timeout=None) as client:
-            payload = {
-                "messages": [
-                    {"role": "system", "content": request.system_prompt},
-                    {"role": "user", "content": request.message}
+        try:
+            stream = await self.client.chat.completions.create(
+                model=self.deployment,
+                messages=[
+                    {"role": "system", "content": request.system_prompt or ""},
+                    {"role": "user", "content": request.message},
                 ],
-                "stream": True
-            }
-            headers = {"api-key": self.api_key, "Content-Type": "application/json"}
-            
-            async with client.stream("POST", self.url, headers=headers, json=payload) as response:
-                async for line in response.aiter_lines():
-                    if line.startswith("data: "):
-                        line = line[6:]
-                        if line == "[DONE]":
-                            break
-                        try:
-                            data = json.loads(line)
-                            delta = data["choices"][0].get("delta", {})
-                            if "content" in delta:
-                                yield delta["content"]
-                        except:
-                            continue
+                stream=True,
+            )
+            async for chunk in stream:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+        except APITimeoutError:
+            logger.error("Azure OpenAI stream timed out")
+            yield "\n\n[Error: Request timed out. Please try again.]"
+        except APIError as e:
+            logger.error("Azure OpenAI stream API error: status=%s", e.status_code)
+            yield "\n\n[Error: Azure OpenAI service error.]"
+        except Exception:
+            logger.exception("Unexpected Azure OpenAI stream error")
+            yield "\n\n[Error: An unexpected error occurred.]"
+
 
 class DeepSeekService(BaseLLMService):
+    """Azure AI Foundry - DeepSeek-R1 (OpenAI-compatible API)."""
+
     def __init__(self):
-        self.api_key = settings.DEEPSEEK_API_KEY
-        self.endpoint = settings.DEEPSEEK_ENDPOINT.rstrip("/")
-        self.url = f"{self.endpoint}/v1/chat/completions"
+        endpoint = (settings.DEEPSEEK_ENDPOINT or "").rstrip("/")
+        if endpoint and "/openai/v1" not in endpoint:
+            endpoint = f"{endpoint}/openai/v1"
+        api_key = settings.DEEPSEEK_API_KEY or settings.AZURE_KEY
+        self.client = AsyncOpenAI(
+            base_url=f"{endpoint}/" if endpoint else "",
+            api_key=api_key,
+            timeout=REQUEST_TIMEOUT,
+        )
+        self.deployment = settings.DEEPSEEK_DEPLOYMENT
 
     async def get_completion(self, request: ChatRequest) -> Dict[str, Any]:
         start_time = time.time()
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            payload = {
-                "model": "deepseek-chat",
-                "messages": [
-                    {"role": "system", "content": request.system_prompt},
-                    {"role": "user", "content": request.message}
+        try:
+            completion = await self.client.chat.completions.create(
+                model=self.deployment,
+                messages=[
+                    {"role": "system", "content": request.system_prompt or ""},
+                    {"role": "user", "content": request.message},
                 ],
-                "stream": False
+            )
+            latency = time.time() - start_time
+            msg = completion.choices[0].message
+            return {
+                "reply": msg.content or "",
+                "model": self.deployment,
+                "usage": completion.usage.model_dump() if completion.usage else None,
+                "latency": round(latency, 3),
             }
-            headers = {
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json"
-            }
-            
-            try:
-                response = await client.post(self.url, headers=headers, json=payload)
-                response.raise_for_status()
-                data = response.json()
-                latency = time.time() - start_time
-                
-                return {
-                    "reply": data["choices"][0]["message"]["content"],
-                    "model": "deepseek-v3",
-                    "usage": data.get("usage"),
-                    "latency": latency
-                }
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"DeepSeek Error: {str(e)}")
+        except APITimeoutError:
+            logger.error("DeepSeek request timed out")
+            raise HTTPException(status_code=504, detail="DeepSeek request timed out. Please try again.")
+        except APIError as e:
+            logger.error("DeepSeek API error: status=%s", e.status_code)
+            raise HTTPException(status_code=502, detail="DeepSeek service error. Please try again.")
+        except Exception:
+            logger.exception("Unexpected DeepSeek error")
+            raise HTTPException(status_code=500, detail="An unexpected error occurred with DeepSeek.")
 
     async def get_streaming_completion(self, request: ChatRequest) -> AsyncGenerator[str, None]:
-        async with httpx.AsyncClient(timeout=None) as client:
-            payload = {
-                "model": "deepseek-chat",
-                "messages": [
-                    {"role": "system", "content": request.system_prompt},
-                    {"role": "user", "content": request.message}
+        try:
+            stream = await self.client.chat.completions.create(
+                model=self.deployment,
+                messages=[
+                    {"role": "system", "content": request.system_prompt or ""},
+                    {"role": "user", "content": request.message},
                 ],
-                "stream": True
-            }
-            headers = {
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json"
-            }
-            
-            async with client.stream("POST", self.url, headers=headers, json=payload) as response:
-                async for line in response.aiter_lines():
-                    if line.startswith("data: "):
-                        line = line[6:]
-                        if line == "[DONE]":
-                            break
-                        try:
-                            data = json.loads(line)
-                            delta = data["choices"][0].get("delta", {})
-                            if "content" in delta:
-                                yield delta["content"]
-                        except:
-                            continue
+                stream=True,
+            )
+            async for chunk in stream:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+        except APITimeoutError:
+            logger.error("DeepSeek stream timed out")
+            yield "\n\n[Error: Request timed out. Please try again.]"
+        except APIError as e:
+            logger.error("DeepSeek stream API error: status=%s", e.status_code)
+            yield "\n\n[Error: DeepSeek service error.]"
+        except Exception:
+            logger.exception("Unexpected DeepSeek stream error")
+            yield "\n\n[Error: An unexpected error occurred.]"

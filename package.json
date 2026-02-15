@@ -1,0 +1,15 @@
+{
+  "name": "dualai-chat",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "build:frontend": "npm run build --workspace=apps/frontend",
+    "lint:frontend": "npm run lint --workspace=apps/frontend",
+    "dev": "echo \"Run 'npm run dev:frontend' and backend separately\""
+  }
+}
