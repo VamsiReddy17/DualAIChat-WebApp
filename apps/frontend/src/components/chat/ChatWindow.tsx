@@ -123,11 +123,27 @@ export const ChatWindow = () => {
                             <div className="flex flex-col gap-1 pb-3">
                                 {!history.length && <p className="text-xs text-muted-foreground/70 text-center py-8">No conversations yet</p>}
                                 {history.map(c => (
-                                    <div key={c.id} className="group relative flex items-center rounded-lg hover:bg-muted/50 transition-colors">
-                                        <button onClick={() => load(c)} className={cn("w-full flex items-center gap-2 px-3 py-2 pr-9 rounded-lg text-left text-xs transition-colors min-w-0", chatId === c.id ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}>
-                                            <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" /><span className="truncate">{c.title}</span>
+                                    <div key={c.id} className={cn(
+                                        "flex items-center gap-1 rounded-lg transition-colors",
+                                        chatId === c.id ? "bg-muted" : "hover:bg-muted/50"
+                                    )}>
+                                        <button
+                                            onClick={() => load(c)}
+                                            className={cn(
+                                                "flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-left text-xs transition-colors min-w-0",
+                                                chatId === c.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                                            )}
+                                        >
+                                            <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" />
+                                            <span className="truncate">{c.title}</span>
                                         </button>
-                                        <Button variant="ghost" size="icon" className="absolute right-1 h-7 w-7 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive" onClick={() => setHistory(p => p.filter(h => h.id !== c.id))}><Trash2 className="w-3 h-3" /></Button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setHistory(p => p.filter(h => h.id !== c.id)); }}
+                                            className="shrink-0 p-1.5 mr-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                                            title="Delete conversation"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
                                     </div>
                                 ))}
                             </div>

@@ -211,14 +211,23 @@ cd ../..
 
 ### 3. Start Development Servers
 
-**Option A — Using Makefile (recommended):**
+**Option A — One-Click (Windows):**
+
+```powershell
+.\scripts\windows\start.bat
+```
+
+> Launches both servers in separate terminals and opens the browser automatically.
+> To stop everything: `.\scripts\windows\stop.bat`
+
+**Option B — Using Makefile (macOS / Linux):**
 
 ```bash
 make dev-backend    # Terminal 1 → http://localhost:8000
 make dev-frontend   # Terminal 2 → http://localhost:5173
 ```
 
-**Option B — Manual:**
+**Option C — Manual:**
 
 ```bash
 # Terminal 1: Backend
@@ -366,6 +375,9 @@ DualAIChat-WebApp/
 │   └── typescript-config/              # Base + React tsconfig
 │
 ├── scripts/                            # Automation scripts
+│   ├── windows/
+│   │   ├── start.bat                   # One-click start (backend + frontend)
+│   │   └── stop.bat                    # One-click stop (kills both servers)
 │   ├── notion-docs.py                  # Notion documentation generator
 │   ├── notion-subpages.py              # Sub-subpage builder
 │   └── notion-icons.py                 # Page icon updater
@@ -389,7 +401,14 @@ DualAIChat-WebApp/
 
 ## Available Commands
 
-### Makefile
+### Windows Scripts
+
+| Script | Description |
+|--------|-------------|
+| `.\scripts\windows\start.bat` | Start backend + frontend, open browser |
+| `.\scripts\windows\stop.bat` | Stop both servers and close terminals |
+
+### Makefile (macOS / Linux)
 
 | Command | Description |
 |---------|-------------|

@@ -82,7 +82,7 @@ class AzureOpenAIService(BaseLLMService):
             logger.error("Azure AI Foundry stream API error: status=%s", e.status_code)
             yield "\n\n[Error: Azure AI Foundry service error.]"
         except Exception:
-            logger.exception("Unexpected Azure OpenAI stream error")
+            logger.exception("Unexpected Azure AI Foundry stream error")
             yield "\n\n[Error: An unexpected error occurred.]"
 
 
