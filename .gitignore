@@ -6,28 +6,36 @@
 .env
 .env.local
 .env.*.local
+apps/backend/.env
+apps/frontend/.env
 
 # ---- Python ----
 __pycache__/
+**/__pycache__/
 *.py[cod]
+*.pyc
+*.pyo
 *.egg-info/
 *.egg
 dist/
 build/
 venv/
 .venv/
+**/venv/
+**/.venv/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 htmlcov/
 .coverage
-*.pyo
 
 # ---- Node / Frontend ----
 node_modules/
-frontend/dist/
+**/node_modules/
+apps/frontend/dist/
 .cache/
 *.tsbuildinfo
+.turbo/
 
 # ---- IDE ----
 .vscode/
@@ -35,6 +43,7 @@ frontend/dist/
 *.swp
 *.swo
 *~
+.cursor/
 
 # ---- OS ----
 .DS_Store

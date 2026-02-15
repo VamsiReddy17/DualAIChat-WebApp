@@ -1,10 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3b82f6"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="b" x1="6" y1="6" x2="30" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="v" x1="18" y1="14" x2="42" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="8" fill="url(#g)"/>
-  <path d="M8 11h7v2H8zm0 4h5v2H8zm0 4h7v2H8zM17 11h7v2h-7zm0 4h5v2h-5zm0 4h7v2h-7z" fill="white" opacity="0.9"/>
+  <rect width="48" height="48" rx="12" fill="url(#bg)"/>
+  <path d="M6 12C6 9.79 7.79 8 10 8H25C27.21 8 29 9.79 29 12V23C29 25.21 27.21 27 25 27H14L9 31V27C7.34 27 6 25.66 6 24V12Z" fill="url(#b)" opacity="0.9"/>
+  <circle cx="12" cy="15" r="1.1" fill="white" opacity="0.7"/>
+  <circle cx="18" cy="12" r="0.9" fill="white" opacity="0.5"/>
+  <circle cx="22" cy="17" r="1.1" fill="white" opacity="0.7"/>
+  <circle cx="15" cy="20" r="0.9" fill="white" opacity="0.5"/>
+  <line x1="12" y1="15" x2="18" y2="12" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="18" y1="12" x2="22" y2="17" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="12" y1="15" x2="15" y2="20" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="22" y1="17" x2="15" y2="20" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <path d="M19 19C19 16.79 20.79 15 23 15H38C40.21 15 42 16.79 42 19V30C42 32.21 40.21 34 38 34H36V38L31 34H23C20.79 34 19 32.21 19 30V19Z" fill="url(#v)" opacity="0.9"/>
+  <circle cx="26" cy="22" r="1.1" fill="white" opacity="0.7"/>
+  <circle cx="32" cy="19" r="0.9" fill="white" opacity="0.5"/>
+  <circle cx="36" cy="24" r="1.1" fill="white" opacity="0.7"/>
+  <circle cx="29" cy="27" r="0.9" fill="white" opacity="0.5"/>
+  <circle cx="34" cy="29" r="0.9" fill="white" opacity="0.5"/>
+  <line x1="26" y1="22" x2="32" y2="19" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="32" y1="19" x2="36" y2="24" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="26" y1="22" x2="29" y2="27" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="36" y1="24" x2="34" y2="29" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="29" y1="27" x2="34" y2="29" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <circle cx="24" cy="22" r="1.8" fill="white" opacity="0.85"/>
+  <circle cx="24" cy="22" r="3" fill="white" opacity="0.12"/>
 </svg>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-    Send, BrainCircuit, Zap, LayoutGrid, Sparkles, MessageSquare,
+    Send, BrainCircuit, LayoutGrid, Sparkles, MessageSquare,
     Plus, Trash2, Settings2, Terminal, StopCircle, WifiOff,
     PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react';
+import { DualAILogo } from '@/components/ui/DualAILogo';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -114,7 +115,7 @@ export const ChatWindow = () => {
                 {sidebar && (
                     <motion.aside initial={{width:0,opacity:0}} animate={{width:280,opacity:1}} exit={{width:0,opacity:0}} transition={{duration:0.2}} className="flex-none h-full border-r border-border/50 bg-card/30 flex flex-col overflow-hidden">
                         <div className="p-4 flex items-center gap-3 border-b border-border/40">
-                            <div className="bg-gradient-to-br from-blue-600 to-violet-600 p-2 rounded-xl"><Zap className="w-4 h-4 text-white" /></div>
+                            <DualAILogo size={36} />
                             <div><div className="font-bold text-sm leading-none">Dual AI Chat</div><div className="text-[11px] text-muted-foreground mt-0.5">Enterprise Edition</div></div>
                         </div>
                         <div className="p-3"><Button onClick={newChat} variant="outline" className="w-full justify-start gap-2 h-9 text-xs font-medium"><Plus className="w-3.5 h-3.5" /> New Conversation</Button></div>
@@ -152,7 +153,7 @@ export const ChatWindow = () => {
                 <header className="flex-none h-14 border-b border-border/40 bg-background/80 backdrop-blur-lg flex items-center justify-between px-4 z-20">
                     <div className="flex items-center gap-2">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSidebar(!sidebar)}>{sidebar ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}</Button>
-                        {!sidebar && <div className="flex items-center gap-2 ml-1"><div className="bg-gradient-to-br from-blue-600 to-violet-600 p-1.5 rounded-lg"><Zap className="w-3.5 h-3.5 text-white" /></div><span className="font-semibold text-sm">Dual AI Chat</span></div>}
+                        {!sidebar && <div className="flex items-center gap-2 ml-1"><DualAILogo size={28} /><span className="font-semibold text-sm">Dual AI Chat</span></div>}
                     </div>
                     <div className="flex items-center bg-muted/50 p-0.5 rounded-lg border border-border/40">
                         {([['both','Dual View',<LayoutGrid className="w-3.5 h-3.5" key="dv"/>],['gpt-4','GPT-4o',<Sparkles className="w-3.5 h-3.5 text-blue-500" key="gpt"/>],['deepseek','DeepSeek-R1',<BrainCircuit className="w-3.5 h-3.5 text-violet-500" key="ds"/>]] as const).map(([k,l,ic]) => (
