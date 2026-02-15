@@ -9,7 +9,7 @@ export const MODELS = {
   GPT4: {
     id: 'gpt-4' as const,
     label: 'GPT-4o',
-    provider: 'Azure OpenAI',
+    provider: 'Azure AI Foundry',
     description: 'Fast & Versatile',
   },
   DEEPSEEK: {

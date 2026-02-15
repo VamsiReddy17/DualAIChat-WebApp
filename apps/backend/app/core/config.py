@@ -23,7 +23,7 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    # Azure OpenAI (Cognitive Services) — gpt-4o-mini
+    # Azure AI Foundry — gpt-4o-mini
     AZURE_KEY: str | None = None
     AZURE_ENDPOINT: str | None = None
     AZURE_API_VERSION: str = "2024-12-01-preview"

@@ -28,7 +28,7 @@
 
 | Model | Provider | Endpoint |
 |-------|----------|----------|
-| GPT-4o-mini | Azure OpenAI (Cognitive Services) | `*.cognitiveservices.azure.com` |
+| GPT-4o-mini | Azure AI Foundry | `*.services.ai.azure.com` |
 | DeepSeek-R1 | Azure AI Foundry | `*.services.ai.azure.com` |
 
 ## API Contract

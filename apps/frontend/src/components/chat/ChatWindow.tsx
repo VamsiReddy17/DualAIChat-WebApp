@@ -164,7 +164,7 @@ export const ChatWindow = () => {
                 </header>
 
                 <div className="flex-1 flex flex-col md:flex-row overflow-hidden p-3 gap-3 min-h-0">
-                    {(selectedModel === 'both' || selectedModel === 'gpt-4') && panel('gpt-4', 'GPT-4o', 'Azure OpenAI \u00b7 Fast & Versatile', <Sparkles className="w-5 h-5 text-blue-500" />, 'text-blue-600 dark:text-blue-400', 'bg-blue-500/10', refGPT)}
+                    {(selectedModel === 'both' || selectedModel === 'gpt-4') && panel('gpt-4', 'GPT-4o', 'Azure AI Foundry \u00b7 Fast & Versatile', <Sparkles className="w-5 h-5 text-blue-500" />, 'text-blue-600 dark:text-blue-400', 'bg-blue-500/10', refGPT)}
                     {selectedModel === 'both' && <div className="hidden md:block w-px bg-border/30 self-stretch my-6" />}
                     {(selectedModel === 'both' || selectedModel === 'deepseek') && panel('deepseek', 'DeepSeek-R1', 'Azure AI Foundry \u00b7 Reasoning', <BrainCircuit className="w-5 h-5 text-violet-500" />, 'text-violet-600 dark:text-violet-400', 'bg-violet-500/10', refDS)}
                 </div>

@@ -23,7 +23,7 @@
 
 ## What is Dual AI Chat?
 
-**Dual AI Chat** is an enterprise-grade web application that lets you send a single prompt to **two AI models simultaneously** and compare their responses in real-time, side-by-side. Built on Microsoft Azure's AI infrastructure, it streams responses token-by-token using Server-Sent Events (SSE), so you see answers appear as they're generated.
+**Dual AI Chat** is an enterprise-grade web application that lets you send a single prompt to **two AI models simultaneously** and compare their responses in real-time, side-by-side. Built on **Azure AI Foundry**, it streams responses token-by-token using Server-Sent Events (SSE), so you see answers appear as they're generated.
 
 ### Why?
 
@@ -91,7 +91,7 @@ User types a message
        v
   LLM Service Layer
        |
-       +---> AzureOpenAIService ---> Azure OpenAI (GPT-4o-mini)
+       +---> AzureOpenAIService ---> Azure AI Foundry (GPT-4o-mini)
        |         (AsyncAzureOpenAI SDK)
        |
        +---> DeepSeekService ------> Azure AI Foundry (DeepSeek-R1)
@@ -110,7 +110,7 @@ User types a message
 2. **CORS middleware** validates the request origin
 3. **Request logging** captures method, path, and starts a timer
 4. **Pydantic** validates the request body against the `ChatRequest` schema
-5. **LLM Service** selects the correct Azure client (OpenAI or AI Foundry)
+5. **LLM Service** selects the correct Azure AI Foundry client for the chosen model
 6. **Azure SDK** streams tokens back using async generators
 7. **FastAPI** wraps each token in an SSE event (`data: {"type":"delta","content":"..."}`)
 8. **Frontend** reads the stream and appends each token to the message bubble
@@ -159,8 +159,8 @@ User types a message
 
 | Model | Provider | Strengths |
 |-------|----------|-----------|
-| **GPT-4o-mini** | Azure OpenAI (Cognitive Services) | Fast, versatile, great for general tasks |
-| **DeepSeek-R1** | Azure AI Foundry (MaaS) | Deep chain-of-thought reasoning, math, logic |
+| **GPT-4o-mini** | Azure AI Foundry | Fast, versatile, great for general tasks |
+| **DeepSeek-R1** | Azure AI Foundry | Deep chain-of-thought reasoning, math, logic |
 
 ---
 
@@ -170,9 +170,7 @@ User types a message
 
 - **Python 3.11+** ([python.org](https://python.org))
 - **Node.js 18+** ([nodejs.org](https://nodejs.org))
-- **Azure account** with:
-  - Azure OpenAI resource (GPT-4o-mini deployed)
-  - Azure AI Foundry resource (DeepSeek-R1 available)
+- **Azure account** with an Azure AI Foundry resource (GPT-4o-mini and DeepSeek-R1 deployed)
 
 ### 1. Clone & Configure
 
@@ -187,9 +185,9 @@ cp .env.example .env
 Edit `.env` with your Azure credentials:
 
 ```env
-# Azure OpenAI (Cognitive Services) — GPT-4o-mini
-AZURE_ENDPOINT=https://your-resource.cognitiveservices.azure.com/
-AZURE_KEY=your-azure-openai-key
+# Azure AI Foundry — GPT-4o-mini
+AZURE_ENDPOINT=https://your-resource.services.ai.azure.com/
+AZURE_KEY=your-azure-api-key
 AZURE_API_VERSION=2024-12-01-preview
 AZURE_DEPLOYMENT=gpt-4o-mini
 
@@ -411,8 +409,8 @@ DualAIChat-WebApp/
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `AZURE_ENDPOINT` | Yes | — | Azure OpenAI endpoint URL |
-| `AZURE_KEY` | Yes | — | Azure API key |
+| `AZURE_ENDPOINT` | Yes | — | Azure AI Foundry endpoint URL |
+| `AZURE_KEY` | Yes | — | Azure AI Foundry API key |
 | `AZURE_API_VERSION` | No | `2024-12-01-preview` | Azure API version |
 | `AZURE_DEPLOYMENT` | No | `gpt-4o-mini` | GPT deployment name |
 | `DEEPSEEK_ENDPOINT` | Yes* | — | Azure AI Foundry endpoint |
@@ -479,7 +477,7 @@ Please follow the existing code style and include tests for new features.
 
 <div align="center">
 
-**Built with Azure AI, React, and FastAPI**
+**Built with Azure AI Foundry, React, and FastAPI**
 
 <sub>Phase 1 Complete &bull; Designed for enterprise-grade AI comparison</sub>
 

@@ -21,7 +21,7 @@ class BaseLLMService:
 
 
 class AzureOpenAIService(BaseLLMService):
-    """Azure OpenAI (Cognitive Services) - gpt-4o-mini."""
+    """Azure AI Foundry - gpt-4o-mini."""
 
     def __init__(self):
         self.client = AsyncAzureOpenAI(
@@ -53,14 +53,14 @@ class AzureOpenAIService(BaseLLMService):
                 "latency": round(latency, 3),
             }
         except APITimeoutError:
-            logger.error("Azure OpenAI request timed out")
-            raise HTTPException(status_code=504, detail="Azure OpenAI request timed out. Please try again.")
+            logger.error("Azure AI Foundry request timed out")
+            raise HTTPException(status_code=504, detail="Azure AI Foundry request timed out. Please try again.")
         except APIError as e:
-            logger.error("Azure OpenAI API error: status=%s", e.status_code)
-            raise HTTPException(status_code=502, detail="Azure OpenAI service error. Please try again.")
+            logger.error("Azure AI Foundry API error: status=%s", e.status_code)
+            raise HTTPException(status_code=502, detail="Azure AI Foundry service error. Please try again.")
         except Exception as e:
-            logger.exception("Unexpected Azure OpenAI error")
-            raise HTTPException(status_code=500, detail="An unexpected error occurred with Azure OpenAI.")
+            logger.exception("Unexpected Azure AI Foundry error")
+            raise HTTPException(status_code=500, detail="An unexpected error occurred with Azure AI Foundry.")
 
     async def get_streaming_completion(self, request: ChatRequest) -> AsyncGenerator[str, None]:
         try:
@@ -76,11 +76,11 @@ class AzureOpenAIService(BaseLLMService):
                 if chunk.choices and chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except APITimeoutError:
-            logger.error("Azure OpenAI stream timed out")
+            logger.error("Azure AI Foundry stream timed out")
             yield "\n\n[Error: Request timed out. Please try again.]"
         except APIError as e:
-            logger.error("Azure OpenAI stream API error: status=%s", e.status_code)
-            yield "\n\n[Error: Azure OpenAI service error.]"
+            logger.error("Azure AI Foundry stream API error: status=%s", e.status_code)
+            yield "\n\n[Error: Azure AI Foundry service error.]"
         except Exception:
             logger.exception("Unexpected Azure OpenAI stream error")
             yield "\n\n[Error: An unexpected error occurred.]"
